@@ -227,6 +227,8 @@ function onOpen() {
       }
     }
   }
+  
+  writeBlock("N10 MSG **HAZARD WARNING** Equip safety glasses now!");
 
   // absolute coordinates and feed per min
   writeBlock(gAbsIncModal.format(90), gFeedModeModal.format(94));
@@ -523,7 +525,8 @@ function onSectionEnd() {
 
 function onClose() {
   writeBlock(gMotionModal.format(1), sOutput.format(0)); // laser off
-  writeBlock(mFormat.format(30)); // stop program, spindle stop, coolant off
+  writeBlock(mFormat.format(30));                        // stop program, spindle stop, coolant off
+	writeBlock("Operation complete.");
   writeln("%");
 }
 
