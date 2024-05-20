@@ -343,6 +343,7 @@ function onSection() {
   writeComment("Move before turning on laser");
   var initialPosition = getFramePosition(currentSection.getInitialPosition());
   writeBlock(gMotionModal.format(0), xOutput.format(initialPosition.x), yOutput.format(initialPosition.y));
+  writeBlock(gMotionModal.format(0), zOutput.format(0));
 
 	writeln("");
   writeComment("********************************************************************************");
