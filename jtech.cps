@@ -336,7 +336,7 @@ function onSection() {
     writeBlock(gMotionModal.format(0), zOutput.format(0));
     break;
   case JET_MODE_ETCHING:
-    writeBlock(gMotionModal.format(0), zOutput.format(0.625));
+    writeBlock(gMotionModal.format(0), zOutput.format(0.25));
     break;
   case JET_MODE_VAPORIZE:
     error(localize("Unsupported cutting mode: VAPORIZE"));
