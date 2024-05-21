@@ -290,20 +290,6 @@ function onSection() {
     }
 
     var power = tool.getCutPower();
-//    switch (currentSection.jetMode) {
-//    case JET_MODE_THROUGH:
-//      power = getProperty("throughPower");
-//      break;
-//    case JET_MODE_ETCHING:
-//      power = getProperty("etchPower");
-//      break;
-//    case JET_MODE_VAPORIZE:
-//      power = getProperty("vaporizePower");
-//      break;
-//    default:
-//      error(localize("Unsupported cutting mode."));
-//      return;
-//    }
 
   } else {
     error(localize("The CNC does not support the required tool/process. Only laser cutting is supported."));
@@ -343,7 +329,22 @@ function onSection() {
   writeComment("Move before turning on laser");
   var initialPosition = getFramePosition(currentSection.getInitialPosition());
   writeBlock(gMotionModal.format(0), xOutput.format(initialPosition.x), yOutput.format(initialPosition.y));
-  writeBlock(gMotionModal.format(0), zOutput.format(0));
+
+  var zLevel;
+  switch (currentSection.jetMode) {
+  case JET_MODE_THROUGH:
+    writeBlock(gMotionModal.format(0), zOutput.format(0));
+    break;
+  case JET_MODE_ETCHING:
+    writeBlock(gMotionModal.format(0), zOutput.format(0.625));
+    break;
+  case JET_MODE_VAPORIZE:
+    error(localize("Unsupported cutting mode: VAPORIZE"));
+    return;
+  default:
+    error(localize("Unsupported cutting mode: " + str(currentSection.jetMode)));
+    return;
+  }
 
 	writeln("");
   writeComment("********************************************************************************");
@@ -471,7 +472,8 @@ function onCircular(clockwise, cx, cy, cz, x, y, z, feed) {
     switch (getCircularPlane()) {
     case PLANE_XY:
       forceCircular(getCircularPlane());
-      writeBlock(gMotionModal.format(clockwise ? 2 : 3), xOutput.format(x), yOutput.format(y), zOutput.format(z), iOutput.format(cx - start.x), jOutput.format(cy - start.y), feedOutput.format(feed));
+      // writeBlock(gMotionModal.format(clockwise ? 2 : 3), xOutput.format(x), yOutput.format(y), zOutput.format(z), iOutput.format(cx - start.x), jOutput.format(cy - start.y), feedOutput.format(feed));
+      writeBlock(gMotionModal.format(clockwise ? 2 : 3), xOutput.format(x), yOutput.format(y), iOutput.format(cx - start.x), jOutput.format(cy - start.y), feedOutput.format(feed));
       break;
     default:
       linearize(tolerance);
