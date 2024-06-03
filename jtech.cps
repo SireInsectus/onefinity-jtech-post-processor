@@ -331,7 +331,7 @@ function onPower(power) {
 	if (power) {
 	  writeBlock(gMotionModal.format(0),
 	  				   sOutput.format(tool.getCutPower()),
-	             mFormat.format(4),
+	             mFormat.format(3),
 	             "; Set power level; enable laser; onPower()");
 
 	} else {
