@@ -75,31 +75,6 @@ properties = {
     value      : true,
     scope      : "post"
   }
-//  ,
-//  throughPower: {
-//    title      : "Through power",
-//    description: "Sets the laser power used for through cutting.",
-//    group      : "preferences",
-//    type       : "number",
-//    value      : 255,
-//    scope      : "post"
-//  },
-//  etchPower: {
-//    title      : "Etch power",
-//    description: "Sets the laser power used for etching.",
-//    group      : "preferences",
-//    type       : "number",
-//    value      : 50,
-//    scope      : "post"
-//  },
-//  vaporizePower: {
-//    title      : "Vaporize power",
-//    description: "Sets the laser power used for vaporize cutting.",
-//    group      : "preferences",
-//    type       : "number",
-//    value      : 255,
-//    scope      : "post"
-//  }
 };
 
 // wcs definiton
@@ -280,18 +255,7 @@ function onSection() {
     }
   }
 
-  if (currentSection.getType() == TYPE_JET) {
-    switch (tool.type) {
-    case TOOL_LASER_CUTTER:
-      break;
-    default:
-      error(localize("The CNC does not support the required tool/process. Only laser cutting is supported."));
-      return;
-    }
-
-    var power = tool.getCutPower();
-
-  } else {
+  if (currentSection.getType() != TYPE_JET && tool.type != TOOL_LASER_CUTTER) {
     error(localize("The CNC does not support the required tool/process. Only laser cutting is supported."));
     return;
   }
@@ -316,16 +280,12 @@ function onSection() {
   writeBlock(sTool.format(tool.getNumber()), "M6")
 
 	writeln("");
-  writeComment("Set lowest power level - locating dot");
   writeBlock(gMotionModal.format(0),
-  				   sOutput.format(power),
-             mFormat.format(getPowerMode(currentSection)));
+  				   sOutput.format(tool.getCutPower()),
+             mFormat.format(5),
+             "; Set power level; disable laser; onSection()");
 
 	writeln("");
-  writeComment("Disable laser before move");
-  writeBlock("M5");
-	writeln("");
-
   writeComment("Move before turning on laser");
   var initialPosition = getFramePosition(currentSection.getInitialPosition());
   writeBlock(gMotionModal.format(0), xOutput.format(initialPosition.x), yOutput.format(initialPosition.y));
@@ -367,14 +327,17 @@ function onRadiusCompensation() {
 
 function onPower(power) {
 	writeln("");
+
 	if (power) {
-    // writeComment("Enable laser");
-    writeBlock("M3; Enable laser");
+	  writeBlock(gMotionModal.format(0),
+	  				   sOutput.format(tool.getCutPower()),
+	             mFormat.format(4),
+	             "; Set power level; enable laser; onPower()");
+
 	} else {
-    // writeComment("Disable laser");
-    writeBlock("M5; Disable laser");
+    writeBlock(mFormat.format(5),
+               "; disable laser");
 	}
-	// writeln("");
 }
 
 function onRapid(_x, _y, _z) {
