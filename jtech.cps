@@ -281,8 +281,8 @@ function onSection() {
 
 	writeln("");
   writeBlock(gMotionModal.format(0),
-  				   sOutput.format(tool.getCutPower()),
-             mFormat.format(5),
+  				   sOutput.format(0),       // Power to zero just in case
+             mFormat.format(5),       // Disable the laser
              "; Set power level; disable laser; onSection()");
 
 	writeln("");
@@ -329,15 +329,20 @@ function onPower(power) {
 	writeln("");
 
 	if (power) {
-	  writeBlock(gMotionModal.format(0),
-	  				   sOutput.format(tool.getCutPower()),
-	             mFormat.format(3),
-	             "; Set power level; enable laser; onPower()");
+    var mCmd = 3; // Enable Laser
+    var cutPower = tool.getCutPower();
+    var comment = "; Set power level; enable laser; onPower()";
 
 	} else {
-    writeBlock(mFormat.format(5),
-               "; disable laser");
-	}
+    var mCmd = 3;      // Disable Laser
+    var cutPower = 0;  // Power down just in case
+    var comment = "; Set power level; disable laser; onPower()";
+}
+
+  writeBlock(gMotionModal.format(0),
+             sOutput.format(cutPower),
+             mFormat.format(mCmd),
+             comment);
 }
 
 function onRapid(_x, _y, _z) {
@@ -494,10 +499,15 @@ function onSectionEnd() {
 }
 
 function onClose() {
-  writeBlock(gMotionModal.format(1), sOutput.format(0)); // Power to zero
-  writeBlock("M5");                                      // Lazer off
-  writeBlock("G30");                                     // Go Home
-  writeBlock(mFormat.format(30));                        // stop program, spindle stop, coolant off
+
+  writeBlock(gMotionModal.format(0),
+  				   sOutput.format(0),       // Power to zero just in case
+             mFormat.format(5),       // Disable the laser
+             "; Set power level; disable laser; onClose()");
+
+
+  writeBlock("G30");                  // Go Home
+  writeBlock(mFormat.format(30));     // stop program, spindle stop, coolant off
 	writeBlock("Operation complete.");
 
   writeBlock("MSG **Operation Completed");
